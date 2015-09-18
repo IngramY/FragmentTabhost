@@ -1,73 +1,106 @@
 package ruanyun.com.fragmenttabhost;
 
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TabHost;
+import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
-
+/**
+ *
+ * @author zqy
+ *
+ */
 public class MainActivity extends FragmentActivity {
 
-    FrameLayout tabs;
-    FrameLayout tabcontent;
-    FragmentTabHost tabhost;
+    /**
+     * FragmentTabhost
+     */
+    private FragmentTabHost mTabHost;
 
-    private LayoutInflater layoutInflater;
+    /**
+     * 布局填充器
+     *
+     */
+    private LayoutInflater mLayoutInflater;
 
+    /**
+     * Fragment数组界面
+     *
+     */
+    private Class mFragmentArray[] = { HomeFragment.class, MeassageFragment.class,
+            SelfinfoFragment.class, SquareFragment.class, MoreFragment.class };
 
-    private Class fragments[] = { HomeFragment.class, MeassageFragment.class,
-    MoreFragment.class, SelfinfoFragment.class, SquareFragment.class};
+    /**
+     * 存放图片数组
+     *
+     */
+    private int mImageArray[] = { R.drawable.icon_home,
+            R.drawable.icon_meassage, R.drawable.icon_selfinfo,
+            R.drawable.icon_square, R.drawable.icon_more};
 
+    /**
+     * 选修卡文字
+     *
+     */
+    private int mTextArray[] = { R.string.home, R.string.meassage,
+            R.string.selfinfo, R.string.square, R.string.more};
 
-    private String textviewArray[] = { "首页", "消息", "好友", "广场", "更多" };
-
-    int[] icon ={R.drawable.icon_home, R.drawable.icon_meassage,
-            R.drawable.icon_selfinfo, R.drawable.icon_square, R.drawable.icon_more};
-
+    /**
+     *
+     *
+     */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        TextView textView = (TextView) findViewById(R.id.text1);
-
-        layoutInflater = LayoutInflater.from(this);
         initView();
-
     }
 
+    /**
+     * 初始化组件
+     */
     private void initView() {
-        tabhost = (FragmentTabHost) findViewById(android.R.id.tabhost);
-        tabs = (FrameLayout) findViewById(R.id.realtabcontent);
-        tabcontent = (FrameLayout) findViewById(android.R.id.tabcontent);
+        mLayoutInflater = LayoutInflater.from(this);
 
-        tabhost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
-
-        //添加tab视图
-        for (int i = 0; i < fragments.length; i++ ) {
-            TabHost.TabSpec tabSpec = tabhost.newTabSpec(textviewArray[i])
-                    .setIndicator(getItemView(i));
-            tabhost.addTab(tabSpec, fragments[i], null );
-            tabhost.getTabWidget().getChildAt(i)
-                    .setBackgroundResource(R.drawable.home_btn_bg);
-
+        // 找到TabHost
+        mTabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
+        mTabHost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+        // 得到fragment的个数
+        int count = mFragmentArray.length;
+        for (int i = 0; i < count; i++) {
+            // 给每个Tab按钮设置图标、文字和内容
+            TabSpec tabSpec = mTabHost.newTabSpec(getResources().getString(mTextArray[i]))
+                    .setIndicator(getTabItemView(i));
+            // 将Tab按钮添加进Tab选项卡中
+            mTabHost.addTab(tabSpec, mFragmentArray[i], null);
+            // 设置Tab按钮的背景
+            mTabHost.getTabWidget().getChildAt(i)
+                    .setBackgroundResource(R.drawable.home_btn_bg_selected);
         }
     }
 
-    public View getItemView(int index) {
-        View v = layoutInflater.inflate(R.layout.item_tab_view, null);
-
-        ImageView image = (ImageView) v.findViewById(R.id.image);
-        image.setImageResource(icon[index]);
-
-        TextView text = (TextView) v.findViewById(R.id.text);
-        text.setText(textviewArray[index]);
-
-        return v;
+    /**
+     *
+     * 给每个Tab按钮设置图标和文字
+     */
+    private View getTabItemView(int index) {
+        View view = mLayoutInflater.inflate(R.layout.item_tab_view, null);
+        ImageView imageView = (ImageView) view.findViewById(R.id.image);
+        imageView.setImageResource(mImageArray[index]);
+        TextView textView = (TextView) view.findViewById(R.id.text);
+        textView.setText(mTextArray[index]);
+        //ColorStateList颜色状态改变列表，不同状态文字颜色不同
+        ColorStateList csl = getResources().getColorStateList(R.color.text_color_selected);
+        if (csl != null) {
+            textView.setTextColor(csl);
+        }
+        return view;
     }
+
 }
